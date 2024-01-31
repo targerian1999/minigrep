@@ -15,21 +15,25 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v3
-    - name: Build
-      run: cargo build --verbose
-    - name: Run tests
-      run: cargo test --verbose
+      - uses: actions/checkout@v3
+      - name: Build for Linux
+        run: cargo build --release --verbose
+      - name: Build for Windows
+        run: cargo build --release --target x86_64-pc-windows-msvc --verbose
+      - name: Run tests
+        run: cargo test --verbose
 
   release:
     needs: build
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v3
-    - name: Set up release
-      uses: softprops/action-gh-release@v1
-      with:
-        files: target/release/*
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - uses: actions/checkout@v3
+      - name: Set up release
+        uses: softprops/action-gh-release@v1
+        with:
+          files: |
+            target/release/*-linux
+            target/release/*-windows.exe
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
